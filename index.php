@@ -1,4 +1,7 @@
 <?php
+/**
+ * first index.php
+ */
 session_start();
 
 // Redirect the user to login page if he is not logged in.
@@ -21,61 +24,105 @@ require_once('inc/header.html');
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?php echo t('inventory_system'); ?></title>
     
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
     <!-- Font for Khmer language -->
     <link href="https://fonts.googleapis.com/css2?family=Kantumruy+Pro:wght@300;400;500;600&display=swap" rel="stylesheet">
     
-    <style>
-        /* Language-specific font styling */
-        :lang(km) * {
-            font-family: 'Kantumruy Pro', 'Khmer OS', sans-serif;
-        }
-        
-        /* Ensure language switcher is visible */
-        .language-switcher {
-            display: flex !important;
-            gap: 5px;
-            margin-right: 15px;
-        }
-        
-        .language-switcher a {
-            min-width: 40px;
-            text-align: center;
-            padding: 5px 10px;
-            text-decoration: none;
-            border-radius: 3px;
-            font-weight: 500;
-            font-size: 14px;
-        }
-        
-        .language-switcher .active {
-            background: #007bff !important;
-            color: white !important;
-            border: 1px solid #007bff;
-        }
-        
-        .language-switcher :not(.active) {
-            background: rgba(255, 255, 255, 0.1);
-            color: rgba(255, 255, 255, 0.8);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-        }
-        
-        .requiredIcon {
-            color: red;
-        }
-        
-        .blueText {
-            color: #007bff;
-        }
-        
-        .nav-link.active {
-            background-color: #007bff !important;
-            color: white !important;
-        }
-        
-        body {
-            padding-top: 70px;
-        }
-    </style>
+   <style>
+    /* Language-specific font styling */
+    :lang(km) * {
+        font-family: 'Kantumruy Pro', 'Khmer OS', sans-serif;
+    }
+    
+    /* Ensure language switcher is visible */
+    .language-switcher {
+        display: flex !important;
+        gap: 5px;
+        margin-right: 15px;
+    }
+    
+    .language-switcher a {
+        min-width: 40px;
+        text-align: center;
+        padding: 5px 10px;
+        text-decoration: none;
+        border-radius: 3px;
+        font-weight: 500;
+        font-size: 14px;
+    }
+    
+    .language-switcher .active {
+        background: #007bff !important;
+        color: white !important;
+        border: 1px solid #007bff;
+    }
+    
+    .language-switcher :not(.active) {
+        background: rgba(255, 255, 255, 0.1);
+        color: rgba(255, 255, 255, 0.8);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+    }
+    
+    .requiredIcon {
+        color: red;
+    }
+    
+    .blueText {
+        color: #007bff;
+    }
+    
+    .nav-link.active {
+        background-color: #007bff !important;
+        color: white !important;
+    }
+    
+    body {
+        padding-top: 70px;
+    }
+    
+    /* Bulk upload styles */
+    .preview-table {
+        font-size: 12px;
+    }
+    
+    .preview-table th {
+        background-color: #f8f9fa;
+        font-weight: 600;
+    }
+    
+    .upload-area {
+        border: 2px dashed #dee2e6;
+        border-radius: 5px;
+        padding: 20px;
+        text-align: center;
+        background-color: #f8f9fa;
+        cursor: pointer;
+        transition: all 0.3s;
+    }
+    
+    .upload-area:hover {
+        border-color: #007bff;
+        background-color: #e9ecef;
+    }
+    
+    .upload-area i {
+        font-size: 48px;
+        color: #6c757d;
+        margin-bottom: 10px;
+    }
+    
+    .upload-area.dragover {
+        border-color: #28a745;
+        background-color: #d4edda;
+    }
+    
+    .template-download {
+        border-left: 4px solid #007bff;
+        padding-left: 15px;
+    }
+</style>
 </head>
 <body>
 
@@ -584,9 +631,178 @@ if (file_exists('inc/navigation.php')) {
               <div class="tab-content">
                 <div id="itemReportsTab" class="container-fluid tab-pane active">
                   <br>
-                  <p><?php echo t('get_item_reports'); ?></p>
+                  <div class="row mb-4">
+                    <div class="col-md-8">
+                      <p><?php echo t('get_item_reports'); ?></p>
+                    </div>
+                    <div class="col-md-4 text-right">
+                      <!-- Bulk Upload Button -->
+                      <button type="button" class="btn btn-success btn-sm" data-toggle="modal" data-target="#bulkUploadModal">
+                        <i class="fas fa-upload"></i> <?php echo t('bulk_upload_items'); ?>
+                      </button>
+                    </div>
+                  </div>
+                  
+                  <!-- Bulk Upload Modal -->
+                  <div class="modal fade" id="bulkUploadModal" tabindex="-1" role="dialog" aria-labelledby="bulkUploadModalLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-lg" role="document">
+                      <div class="modal-content">
+                        <div class="modal-header bg-primary text-white">
+                          <h5 class="modal-title" id="bulkUploadModalLabel">
+                            <i class="fas fa-file-upload"></i> <?php echo t('bulk_upload_items'); ?>
+                          </h5>
+                          <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                          </button>
+                        </div>
+                        <div class="modal-body">
+                          <div class="row">
+                            <div class="col-md-5">
+                              <div class="template-download mb-4">
+                                <h6><i class="fas fa-file-download text-primary"></i> <?php echo t('download_template'); ?></h6>
+                                <p class="small"><?php echo t('template_description'); ?></p>
+                                <button type="button" id="downloadTemplate" class="btn btn-outline-primary btn-sm btn-block">
+                                  <i class="fas fa-download"></i> <?php echo t('download_csv_template'); ?>
+                                </button>
+                              </div>
+                              
+                              <div class="alert alert-info">
+                                <h6><i class="fas fa-info-circle"></i> <?php echo t('upload_instructions'); ?></h6>
+                                <ul class="mb-0 small">
+                                  <li><i class="fas fa-check-circle text-success"></i> <?php echo t('csv_only'); ?></li>
+                                  <li><i class="fas fa-check-circle text-success"></i> <?php echo t('max_file_size'); ?>: 5MB</li>
+                                  <li><i class="fas fa-check-circle text-success"></i> <?php echo t('required_fields'); ?>: Item Number, Item Name</li>
+                                  <li><i class="fas fa-check-circle text-success"></i> <?php echo t('existing_items'); ?></li>
+                                </ul>
+                              </div>
+                              
+                              <div class="card mt-3">
+                                <div class="card-header bg-light">
+                                  <h6 class="mb-0"><i class="fas fa-columns"></i> <?php echo t('csv_format'); ?></h6>
+                                </div>
+                                <div class="card-body p-2">
+                                  <table class="table table-sm table-bordered mb-0">
+                                    <thead class="thead-light">
+                                      <tr>
+                                        <th class="py-1">Column</th>
+                                        <th class="py-1">Required</th>
+                                        <th class="py-1">Example</th>
+                                      </tr>
+                                    </thead>
+                                    <tbody>
+                                      <tr>
+                                        <td class="py-1">itemNumber</td>
+                                        <td class="py-1"><span class="badge badge-danger">Required</span></td>
+                                        <td class="py-1">ITEM001</td>
+                                      </tr>
+                                      <tr>
+                                        <td class="py-1">itemName</td>
+                                        <td class="py-1"><span class="badge badge-danger">Required</span></td>
+                                        <td class="py-1">School Bag</td>
+                                      </tr>
+                                      <tr>
+                                        <td class="py-1">discount</td>
+                                        <td class="py-1"><span class="badge badge-secondary">Optional</span></td>
+                                        <td class="py-1">5.5</td>
+                                      </tr>
+                                      <tr>
+                                        <td class="py-1">quantity</td>
+                                        <td class="py-1"><span class="badge badge-warning">Recommended</span></td>
+                                        <td class="py-1">100</td>
+                                      </tr>
+                                      <tr>
+                                        <td class="py-1">unitPrice</td>
+                                        <td class="py-1"><span class="badge badge-warning">Recommended</span></td>
+                                        <td class="py-1">25.99</td>
+                                      </tr>
+                                      <tr>
+                                        <td class="py-1">status</td>
+                                        <td class="py-1"><span class="badge badge-secondary">Optional</span></td>
+                                        <td class="py-1">Active</td>
+                                      </tr>
+                                      <tr>
+                                        <td class="py-1">description</td>
+                                        <td class="py-1"><span class="badge badge-secondary">Optional</span></td>
+                                        <td class="py-1">Red school bag</td>
+                                      </tr>
+                                    </tbody>
+                                  </table>
+                                </div>
+                              </div>
+                            </div>
+                            
+                            <div class="col-md-7">
+                              <div class="upload-area" id="dropArea">
+                                <i class="fas fa-cloud-upload-alt"></i>
+                                <h5><?php echo t('drag_drop_file'); ?></h5>
+                                <p class="text-muted"><?php echo t('or_click_to_browse'); ?></p>
+                                <input type="file" class="d-none" id="bulkUploadFile" name="bulkUploadFile" accept=".csv">
+                                <button type="button" class="btn btn-outline-primary mt-2" id="browseFileBtn">
+                                  <i class="fas fa-folder-open"></i> <?php echo t('browse_files'); ?>
+                                </button>
+                                <p class="small text-muted mt-2 mb-0" id="selectedFileName"></p>
+                              </div>
+                              
+                              <div class="form-group mt-3">
+                                <div class="custom-control custom-switch">
+                                  <input type="checkbox" class="custom-control-input" id="updateExisting" name="updateExisting" checked>
+                                  <label class="custom-control-label" for="updateExisting">
+                                    <strong><?php echo t('update_existing_items'); ?></strong>
+                                  </label>
+                                  <small class="form-text text-muted">
+                                    <?php echo t('update_existing_note'); ?>
+                                  </small>
+                                </div>
+                              </div>
+                              
+                              <div id="filePreview" class="mt-3 d-none">
+                                <div class="card">
+                                  <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                                    <h6 class="mb-0"><i class="fas fa-eye"></i> <?php echo t('file_preview'); ?></h6>
+                                    <span class="badge badge-info" id="previewRowCount"></span>
+                                  </div>
+                                  <div class="card-body p-0">
+                                    <div class="table-responsive" style="max-height: 250px; overflow-y: auto;">
+                                      <table class="table table-sm table-bordered mb-0 preview-table" id="previewTable">
+                                        <thead class="thead-light sticky-top">
+                                          <tr>
+                                            <th>Item Number</th>
+                                            <th>Item Name</th>
+                                            <th>Discount</th>
+                                            <th>Quantity</th>
+                                            <th>Unit Price</th>
+                                          </tr>
+                                        </thead>
+                                        <tbody>
+                                          <!-- Preview rows will be inserted here -->
+                                        </tbody>
+                                      </table>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="modal-footer">
+                          <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                            <i class="fas fa-times"></i> <?php echo t('cancel'); ?>
+                          </button>
+                          <button type="button" class="btn btn-primary" id="uploadCSV" disabled>
+                            <i class="fas fa-upload"></i> <?php echo t('upload_and_process'); ?>
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <!-- Upload Results will be displayed here -->
+                  <div id="uploadResultsContainer"></div>
+                  
+                  <!-- Item Reports Table -->
                   <div class="table-responsive" id="itemReportsTableDiv"></div>
                 </div>
+                
                 <div id="customerReportsTab" class="container-fluid tab-pane fade">
                   <br>
                   <p><?php echo t('get_customer_reports'); ?></p>
@@ -652,3 +868,260 @@ if (file_exists('inc/footer.php')) {
 } else {
     echo '</body></html>';
 }
+?>
+
+<script>
+$(document).ready(function() {
+    // File upload handling
+    $('#browseFileBtn').click(function() {
+        $('#bulkUploadFile').click();
+    });
+    
+    $('#bulkUploadFile').on('change', function() {
+        var fileName = $(this).val().split('\\').pop();
+        if (fileName) {
+            $('#selectedFileName').html('<i class="fas fa-file-csv text-success"></i> ' + fileName);
+            $('#uploadCSV').prop('disabled', false);
+            previewCSVFile(this);
+        }
+    });
+    
+    // Drag and drop functionality
+    const dropArea = $('#dropArea')[0];
+    
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+        dropArea.addEventListener(eventName, preventDefaults, false);
+    });
+    
+    function preventDefaults(e) {
+        e.preventDefault();
+        e.stopPropagation();
+    }
+    
+    ['dragenter', 'dragover'].forEach(eventName => {
+        dropArea.addEventListener(eventName, highlight, false);
+    });
+    
+    ['dragleave', 'drop'].forEach(eventName => {
+        dropArea.addEventListener(eventName, unhighlight, false);
+    });
+    
+    function highlight() {
+        $(dropArea).addClass('dragover');
+    }
+    
+    function unhighlight() {
+        $(dropArea).removeClass('dragover');
+    }
+    
+    dropArea.addEventListener('drop', handleDrop, false);
+    
+    function handleDrop(e) {
+        const dt = e.dataTransfer;
+        const files = dt.files;
+        
+        if (files.length > 0) {
+            $('#bulkUploadFile')[0].files = files;
+            $('#bulkUploadFile').trigger('change');
+        }
+    }
+    
+    // Download template
+    $('#downloadTemplate').click(function(e) {
+        e.preventDefault();
+        downloadCSVTemplate();
+    });
+    
+    // Upload CSV file
+    $('#uploadCSV').click(function() {
+        uploadCSVFile();
+    });
+    
+    // Close upload results
+    $(document).on('click', '.alert-dismissible .close', function() {
+        $(this).closest('.alert').remove();
+    });
+});
+
+function previewCSVFile(input) {
+    const file = input.files[0];
+    if (!file) return;
+    
+    const reader = new FileReader();
+    
+    reader.onload = function(e) {
+        const contents = e.target.result;
+        const lines = contents.split('\n').filter(line => line.trim() !== '');
+        
+        if (lines.length === 0) {
+            $('#filePreview').addClass('d-none');
+            return;
+        }
+        
+        const previewRows = lines.slice(0, 6); // Show first 5 data rows + header
+        
+        let tableHTML = '';
+        const headers = previewRows[0].split(',').map(h => h.trim());
+        
+        // Build header row
+        let headerRow = '<thead class="thead-light sticky-top"><tr>';
+        headers.forEach(header => {
+            headerRow += `<th>${header}</th>`;
+        });
+        headerRow += '</tr></thead><tbody>';
+        tableHTML += headerRow;
+        
+        // Build data rows (max 5)
+        for (let i = 1; i < Math.min(previewRows.length, 6); i++) {
+            if (previewRows[i].trim() === '') continue;
+            tableHTML += '<tr>';
+            const cells = previewRows[i].split(',').map(c => c.trim());
+            cells.forEach(cell => {
+                tableHTML += `<td>${cell}</td>`;
+            });
+            tableHTML += '</tr>';
+        }
+        tableHTML += '</tbody>';
+        
+        $('#previewTable').html(tableHTML);
+        const totalRows = lines.length - 1;
+        const previewCount = Math.min(totalRows, 5);
+        $('#previewRowCount').text(`${previewCount} of ${totalRows} rows`);
+        $('#filePreview').removeClass('d-none');
+    };
+    
+    reader.readAsText(file);
+}
+
+function downloadCSVTemplate() {
+    const csvContent = "itemNumber,itemName,discount,quantity,unitPrice,status,description\n" +
+                      "ITEM001,First Item,5,100,25.99,Active,Description of first item\n" +
+                      "ITEM002,Second Item,10,50,49.99,Active,Description of second item\n" +
+                      "ITEM003,Third Item,0,200,15.50,Disabled,Description of third item\n" +
+                      "ITEM004,Fourth Item,15,75,99.99,Active,Description of fourth item\n" +
+                      "ITEM005,Fifth Item,2.5,150,12.75,Active,Description of fifth item";
+    
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    
+    link.setAttribute('href', url);
+    link.setAttribute('download', 'item_bulk_upload_template.csv');
+    link.style.visibility = 'hidden';
+    
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    // Show success message
+    showToast('Template downloaded successfully!', 'success');
+}
+
+function uploadCSVFile() {
+    const fileInput = $('#bulkUploadFile')[0];
+    const updateExisting = $('#updateExisting').is(':checked');
+    
+    if (!fileInput.files.length) {
+        showToast('Please select a CSV file first.', 'error');
+        return;
+    }
+    
+    const formData = new FormData();
+    formData.append('bulkUploadFile', fileInput.files[0]);
+    formData.append('updateExisting', updateExisting ? '1' : '0');
+    
+    // Show simple loading message instead of problematic modal
+    $('#uploadResultsContainer').html(`
+        <div class="alert alert-info alert-dismissible fade show" role="alert">
+            <h5 class="alert-heading"><i class="fas fa-spinner fa-spin"></i> Processing Upload</h5>
+            <p>Please wait while your CSV file is being processed...</p>
+        </div>
+    `);
+    
+    // Hide bulk upload modal
+    $('#bulkUploadModal').modal('hide');
+    
+    // Disable upload button during processing
+    $('#uploadCSV').prop('disabled', true);
+    
+    $.ajax({
+        url: 'model/item/bulkUploadItems.php',
+        type: 'POST',
+        data: formData,
+        processData: false,
+        contentType: false,
+        success: function(response) {
+            // Display results immediately
+            $('#uploadResultsContainer').html(response);
+            
+            // Refresh item reports table
+            $('#reportsTablesRefresh').trigger('click');
+            
+            // Reset form
+            $('#bulkUploadFile').val('');
+            $('#selectedFileName').html('');
+            $('#uploadCSV').prop('disabled', true);
+            $('#filePreview').addClass('d-none');
+            
+            // Show the bulk upload modal again if there were errors
+            if (response.includes('alert-warning') || response.includes('alert-danger')) {
+                setTimeout(function() {
+                    $('#bulkUploadModal').modal('show');
+                }, 300);
+            }
+        },
+        error: function(xhr, status, error) {
+            let errorMessage = '<div class="alert alert-danger alert-dismissible fade show" role="alert">' +
+                '<button type="button" class="close" data-dismiss="alert" aria-label="Close">' +
+                '<span aria-hidden="true">&times;</span>' +
+                '</button>' +
+                '<h5 class="alert-heading"><i class="fas fa-exclamation-circle"></i> Upload Error</h5>' +
+                '<p>An error occurred during the upload process:</p>' +
+                '<p><strong>' + error + '</strong></p>' +
+                '<p class="mb-0">Please check your network connection and try again.</p>' +
+                '</div>';
+            
+            $('#uploadResultsContainer').html(errorMessage);
+            
+            // Re-show the modal
+            setTimeout(function() {
+                $('#bulkUploadModal').modal('show');
+            }, 300);
+        }
+    });
+}
+
+function showToast(message, type = 'info') {
+    // Create toast container if it doesn't exist
+    if (!$('#toastContainer').length) {
+        $('body').append('<div id="toastContainer" style="position: fixed; top: 20px; right: 20px; z-index: 9999;"></div>');
+    }
+    
+    const toastId = 'toast-' + Date.now();
+    const bgColor = type === 'success' ? 'bg-success' : type === 'error' ? 'bg-danger' : 'bg-info';
+    const icon = type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'info-circle';
+    
+    const toastHTML = `
+        <div id="${toastId}" class="toast ${bgColor} text-white" role="alert" aria-live="assertive" aria-atomic="true" data-delay="5000">
+            <div class="toast-header ${bgColor} text-white">
+                <i class="fas fa-${icon} mr-2"></i>
+                <strong class="mr-auto">${type.charAt(0).toUpperCase() + type.slice(1)}</strong>
+                <button type="button" class="ml-2 mb-1 close text-white" data-dismiss="toast" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="toast-body">
+                ${message}
+            </div>
+        </div>
+    `;
+    
+    $('#toastContainer').append(toastHTML);
+    $(`#${toastId}`).toast('show');
+    
+    // Remove toast after it's hidden
+    $(`#${toastId}`).on('hidden.bs.toast', function() {
+        $(this).remove();
+    });
+}
+</script>

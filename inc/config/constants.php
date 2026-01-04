@@ -18,4 +18,4 @@
 	
 	// DB name
 	define('DB_NAME', 'inventory_management_system');
-?>ntory
+?>
